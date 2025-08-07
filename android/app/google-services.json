@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "457987491827",
+    "project_id": "tarea9-de2ed",
+    "storage_bucket": "tarea9-de2ed.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:457987491827:android:875300172e3861f58f3486",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDv3XD0jObAMcbv-HJVoQTPt08C_d-naMw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
