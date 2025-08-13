@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'firebase_options.dart';
 import 'agregar_productos_tab.dart';
 import 'ListaProductosTab.dart';
+import 'login_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  FirebaseMessaging messaging = FirebaseMessaging.instance;
-  String? token = await messaging.getToken();
+
+  // (Opcional) token FCM
+  final messaging = FirebaseMessaging.instance;
+  final token = await messaging.getToken();
+  // ignore: avoid_print
   print('🔥 Token Firebase: $token');
 
   runApp(const MyApp());
@@ -23,10 +28,37 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Gestión de Productos por Día',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
       ),
-      home: const HomePage(),
+      home: const AuthGate(), // decide Login vs Home
+    );
+  }
+}
+
+/// Escucha el estado de sesión de Firebase y redirige.
+class AuthGate extends StatelessWidget {
+  const AuthGate({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snap) {
+        if (snap.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+        final user = snap.data;
+        if (user == null) {
+          return const LoginScreen(); // no logueado → login
+        } else {
+          return const HomePage(); // logueado → Home
+        }
+      },
     );
   }
 }
@@ -53,8 +85,18 @@ class HomePage extends StatelessWidget {
           title: const Text('Gestión de Productos'),
           bottom: TabBar(
             isScrollable: true,
-            tabs: dias.map((dia) => Tab(text: dia)).toList(),
+            tabs: dias.map((d) => Tab(text: d)).toList(),
           ),
+          actions: [
+            IconButton(
+              tooltip: 'Cerrar sesión',
+              icon: const Icon(Icons.logout),
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut();
+                // AuthGate se actualizará y mostrará Login automáticamente
+              },
+            ),
+          ],
         ),
         body: TabBarView(
           children: dias.map((dia) {
