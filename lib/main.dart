@@ -12,10 +12,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // (Opcional) token FCM
   final messaging = FirebaseMessaging.instance;
   final token = await messaging.getToken();
-  // ignore: avoid_print
   print('🔥 Token Firebase: $token');
 
   runApp(const MyApp());
@@ -33,12 +31,11 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const AuthGate(), // decide Login vs Home
+      home: const AuthGate(),
     );
   }
 }
 
-/// Escucha el estado de sesión de Firebase y redirige.
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
 
@@ -54,9 +51,9 @@ class AuthGate extends StatelessWidget {
         }
         final user = snap.data;
         if (user == null) {
-          return const LoginScreen(); // no logueado → login
+          return const LoginScreen();
         } else {
-          return const HomePage(); // logueado → Home
+          return const HomePage();
         }
       },
     );
@@ -93,7 +90,6 @@ class HomePage extends StatelessWidget {
               icon: const Icon(Icons.logout),
               onPressed: () async {
                 await FirebaseAuth.instance.signOut();
-                // AuthGate se actualizará y mostrará Login automáticamente
               },
             ),
           ],

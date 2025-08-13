@@ -35,7 +35,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         email: _email.text.trim(),
         password: _pass.text.trim(),
       );
-      // Ya queda logueado; AuthGate enviará a Home. Cerramos esta pantalla.
       if (mounted) Navigator.pop(context);
       _snack('Cuenta creada. ¡Bienvenido!', Colors.green);
     } on FirebaseAuthException catch (e) {

@@ -31,7 +31,6 @@ class _LoginScreenState extends State<LoginScreen> {
         email: _email.text.trim(),
         password: _pass.text.trim(),
       );
-      // AuthGate detecta el login y navega a Home automáticamente
     } on FirebaseAuthException catch (e) {
       final msg = switch (e.code) {
         'user-not-found' => 'Usuario no registrado',
