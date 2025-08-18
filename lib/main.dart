@@ -1,21 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'firebase_options.dart';
-import 'agregar_productos_tab.dart';
-import 'ListaProductosTab.dart';
-import 'login_screen.dart';
+import 'agregar_tarea_tab.dart';
+import 'listar_tareas_tab.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
-  final messaging = FirebaseMessaging.instance;
-  final token = await messaging.getToken();
-  print('🔥 Token Firebase: $token');
-
   runApp(const MyApp());
 }
 
@@ -25,37 +17,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Gestión de Productos por Día',
+      title: 'Gestión de Tareas',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
       ),
-      home: const AuthGate(),
-    );
-  }
-}
-
-class AuthGate extends StatelessWidget {
-  const AuthGate({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snap) {
-        if (snap.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-        final user = snap.data;
-        if (user == null) {
-          return const LoginScreen();
-        } else {
-          return const HomePage();
-        }
-      },
+      home: const HomePage(), // Va directo al Home
     );
   }
 }
@@ -63,47 +31,22 @@ class AuthGate extends StatelessWidget {
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
-  final List<String> dias = const [
-    'Lunes',
-    'Martes',
-    'Miércoles',
-    'Jueves',
-    'Viernes',
-    'Sábado',
-    'Domingo',
-  ];
-
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: dias.length,
+      length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Gestión de Productos'),
-          bottom: TabBar(
-            isScrollable: true,
-            tabs: dias.map((d) => Tab(text: d)).toList(),
+          title: const Text('Gestión de Tareas'),
+          bottom: const TabBar(
+            tabs: [
+              Tab(text: 'Agregar Tarea'),
+              Tab(text: 'Listado Tareas'),
+            ],
           ),
-          actions: [
-            IconButton(
-              tooltip: 'Cerrar sesión',
-              icon: const Icon(Icons.logout),
-              onPressed: () async {
-                await FirebaseAuth.instance.signOut();
-              },
-            ),
-          ],
         ),
-        body: TabBarView(
-          children: dias.map((dia) {
-            return Column(
-              children: [
-                Expanded(child: ListadoProductosTab(dia: dia)),
-                const Divider(),
-                AgregarProductosTab(dia: dia),
-              ],
-            );
-          }).toList(),
+        body: const TabBarView(
+          children: [AgregarTareaTab(), ListarTareasTab()],
         ),
       ),
     );
